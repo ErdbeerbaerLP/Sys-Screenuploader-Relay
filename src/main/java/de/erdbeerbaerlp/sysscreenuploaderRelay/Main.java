@@ -14,6 +14,7 @@ import io.javalin.http.InternalServerErrorResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -22,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 
@@ -68,105 +70,9 @@ public class Main {
             e.printStackTrace();
         }
 
-        String htmlContent = "<!DOCTYPE html>\n" +
-                "<html lang=\"en\">\n" +
-                "<head>\n" +
-                "    <meta charset=\"UTF-8\">\n" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                "    <title>Sys-Screenuploader to Discord</title>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "    <h2>Sys-Screenuploader to Discord</h2>\n" +
-                "    <p>\n" +
-                "        This alternative sys-screenuploader backend server allows you to directly post screenshots and videos to Discord. Videos will not be hosted on an external site.\n" +
-                "    </p>\n" +
-                "    <p>\n" +
-                "        No images or video files will be stored on my server. It only acts as a relay between Discord and sys-screenuploader.\n" +
-                "    </p>\n" +
-                "    <p>\n" +
-                "        Source code can be found <a href=\"https://example.com\">HERE</a>.\n" +
-                "    </p>\n<br/><br/>" +
-                "\n" +
-                "    <label for=\"webhookUrl\">Enter Discord Webhook URL:</label>\n" +
-                "    <input type=\"text\" id=\"webhookUrl\" placeholder=\"Enter your Discord webhook URL\">\n" +
-                "\n" +
-                "    <button onclick=\"convertUrl()\">Convert URL</button>\n" +
-                "\n" +
-                "    <p id=\"convertedUrl\">Converted URL will appear here</p>\n" +
-                "    <button id=\"copyUrlBtn\" onclick=\"copyUrl()\" style=\"display: none;\">Copy URL</button>\n" +
-                "<br/>\n" +
-                "    <h3>How to Use</h3>\n" +
-                "    <p>\n" +
-                "        To post screenshots or videos to Discord using sys-screenuploader, follow these steps:\n" +
-                "    </p>\n" +
-                "    <ol>\n" +
-                "        <li>Copy the Discord webhook URL of the channel you want to post to.</li>\n" +
-                "        <li>Paste the webhook URL in the input field above.</li>\n" +
-                "        <li>Click the \"Convert URL\" button to get the converted URL.</li>\n" +
-                "        <li>Copy the converted URL using the \"Copy URL\" button.</li>\n" +
-                "        <li>Use the copied URL in your sys-screenuploader configuration.</li>\n" +
-                "    </ol>\n" +
-                "\n" +
-                "    <h3>URL Parameters:</h3>\n" +
-                "    <p>\n" +
-                "        <span style=\"text-decoration: underline;\">filename (required)</span> - Filename of the file, automatically added by sys-screenuploader<br>\n" +
-                "        <span style=\"text-decoration: underline;\">caption</span> - Provide an optional caption for the screenshot\n" +
-                "    </p>\n" +
-                "\n" +
-                "    <h3>Supported Placeholders for Caption:</h3>\n" +
-                "    <p>\n" +
-                "        <span style=\"text-decoration: underline;\">{title}</span> - Name of the played title (derived from filename)<br>\n" +
-                "        <span style=\"text-decoration: underline;\">{titleid}</span> - Title ID of the played title (derived from filename)<br>\n" +
-                "        <span style=\"text-decoration: underline;\">{time}</span> - Time of the screenshot (derived from filename)\n" +
-                "    </p>\n" +
-                "\n" +
-                "    <script>\n" +
-                "        function convertUrl() {\n" +
-                "            // Get the input value\n" +
-                "            var inputUrl = document.getElementById(\"webhookUrl\").value;\n" +
-                "\n" +
-                "            // Encode the input URL\n" +
-                "            var encodedUrl = encodeURIComponent(inputUrl);\n" +
-                "\n" +
-                "            // Construct the converted URL\n" +
-                "            var convertedUrl = \"https://api.erdbeerbaerlp.de/sysscreenuploader/discord/\" + encodedUrl;\n" +
-                "\n" +
-                "            // Display the converted URL\n" +
-                "            document.getElementById(\"convertedUrl\").innerText = convertedUrl;\n" +
-                "\n" +
-                "            // Show the \"Copy URL\" button\n" +
-                "            document.getElementById(\"copyUrlBtn\").style.display = \"block\";\n" +
-                "        }\n" +
-                "\n" +
-                "        function copyUrl() {\n" +
-                "            // Get the converted URL\n" +
-                "            var convertedUrl = document.getElementById(\"convertedUrl\").innerText;\n" +
-                "\n" +
-                "            // Create a textarea element to temporarily hold the text\n" +
-                "            var tempInput = document.createElement(\"textarea\");\n" +
-                "            tempInput.value = convertedUrl;\n" +
-                "\n" +
-                "            // Append the textarea to the document\n" +
-                "            document.body.appendChild(tempInput);\n" +
-                "\n" +
-                "            // Select the text in the textarea\n" +
-                "            tempInput.select();\n" +
-                "\n" +
-                "            // Execute the copy command\n" +
-                "            document.execCommand(\"copy\");\n" +
-                "\n" +
-                "            // Remove the textarea\n" +
-                "            document.body.removeChild(tempInput);\n" +
-                "\n" +
-                "            // Provide feedback to the user\n" +
-                "            alert(\"Copied to clipboard: \" + convertedUrl);\n" +
-                "        }\n" +
-                "    </script>\n" +
-                "</body>\n" +
-                "</html>\n";
 
         app.get("/", ctx -> {
-            ctx.result(htmlContent)
+            ctx.result(getHTML("index.html"))
                     .contentType("text/html");
         });
 
@@ -241,5 +147,25 @@ public class Main {
             ctx.result("OK");
             logger.info("OK");
         });
+    }
+
+    private static String getHTML(String htmlFile){
+        InputStream inputStream = Main.class.getClassLoader().getResourceAsStream(htmlFile);
+
+        if (inputStream != null) {
+            // Use a Scanner to read the content of the InputStream
+            final Scanner scanner = new Scanner(inputStream);
+            final StringBuilder content = new StringBuilder();
+
+            // Read line by line and append to the content StringBuilder
+            while (scanner.hasNextLine()) {
+                content.append(scanner.nextLine()).append("\n");
+            }
+
+            // Close the scanner and print the content
+            scanner.close();
+            return content.toString();
+        }
+        return "File not found";
     }
 }

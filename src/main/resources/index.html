@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sys-Screenuploader to Discord</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
+</head>
+<body>
+<a class="github-fork-ribbon" href="https://github.com/ErdbeerbaerLP/Sys-Screenuploader-Relay" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
+
+<h2>Sys-Screenuploader to Discord</h2>
+<p>
+    This alternative sys-screenuploader backend server allows you to directly post screenshots and videos to Discord. Videos will not be hosted on an external site.
+</p>
+<p>
+    No images or video files will be stored on my server. It only acts as a relay between Discord and sys-screenuploader.
+</p>
+<p>
+    Source code can be found <a href="https://example.com">HERE</a>.
+</p>
+<br/><br/>
+<label for="webhookUrl">Enter Discord Webhook URL:</label>
+<input type="text" id="webhookUrl" placeholder="Enter your Discord webhook URL">
+<button onclick="convertUrl()">Convert URL</button>
+<p id="convertedUrl">Converted URL will appear here</p>
+<button id="copyUrlBtn" onclick="copyUrl()" style="display: none;">Copy URL</button>
+<br/>
+<h3>How to Use</h3>
+<p>
+    To post screenshots or videos to Discord using sys-screenuploader, follow these steps:
+</p>
+<ol>
+    <li>Copy the Discord webhook URL of the channel you want to post to.</li>
+    <li>Paste the webhook URL in the input field above.</li>
+    <li>Click the "Convert URL" button to get the converted URL.</li>
+    <li>Copy the converted URL using the "Copy URL" button.</li>
+    <li>Use the copied URL in your sys-screenuploader configuration.</li>
+</ol>
+<h3>URL Parameters:</h3>
+<p>
+    <span style="text-decoration: underline;">filename (required)</span> - Filename of the file, automatically added by sys-screenuploader<br>
+    <span style="text-decoration: underline;">caption</span> - Provide an optional caption for the screenshot
+</p>
+<h3>Supported Placeholders for Caption:</h3>
+<p>
+    <span style="text-decoration: underline;">{title}</span> - Name of the played title (derived from filename)<br>
+    <span style="text-decoration: underline;">{titleid}</span> - Title ID of the played title (derived from filename)<br>
+    <span style="text-decoration: underline;">{time}</span> - Time of the screenshot (derived from filename)
+</p>
+<script>
+    function convertUrl() {
+        // Get the input value
+        var inputUrl = document.getElementById("webhookUrl").value;
+
+        // Encode the input URL
+        var encodedUrl = encodeURIComponent(inputUrl);
+
+        // Construct the converted URL
+        var convertedUrl = "https://api.erdbeerbaerlp.de/sysscreenuploader/discord/" + encodedUrl;
+
+        // Display the converted URL
+        document.getElementById("convertedUrl").innerText = convertedUrl;
+
+        // Show the "Copy URL" button
+        document.getElementById("copyUrlBtn").style.display = "block";
+    }
+
+    function copyUrl() {
+        // Get the converted URL
+        var convertedUrl = document.getElementById("convertedUrl").innerText;
+
+        // Create a textarea element to temporarily hold the text
+        var tempInput = document.createElement("textarea");
+        tempInput.value = convertedUrl;
+
+        // Append the textarea to the document
+        document.body.appendChild(tempInput);
+
+        // Select the text in the textarea
+        tempInput.select();
+
+        // Execute the copy command
+        document.execCommand("copy");
+
+        // Remove the textarea
+        document.body.removeChild(tempInput);
+
+        // Provide feedback to the user
+        alert("Copied to clipboard: " + convertedUrl);
+    }
+</script>
+</body>
+</html>
