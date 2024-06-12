@@ -16,9 +16,6 @@
 <p>
     No images or video files will be stored on my server. It only acts as a relay between Discord and sys-screenuploader.
 </p>
-<p>
-    Source code can be found <a href="https://example.com">HERE</a>.
-</p>
 <br/><br/>
 <label for="webhookUrl">Enter Discord Webhook URL:</label>
 <input type="text" id="webhookUrl" placeholder="Enter your Discord webhook URL">
@@ -57,7 +54,7 @@
         var encodedUrl = encodeURIComponent(inputUrl);
 
         // Construct the converted URL
-        var convertedUrl = "https://api.erdbeerbaerlp.de/sysscreenuploader/discord/" + encodedUrl;
+        var convertedUrl = window.location.href+"/discord/" + encodedUrl;
 
         // Display the converted URL
         document.getElementById("convertedUrl").innerText = convertedUrl;
